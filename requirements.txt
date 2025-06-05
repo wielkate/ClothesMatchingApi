@@ -1,0 +1,6 @@
+fastapi
+pillow
+onnxruntime
+rembg
+colorthief
+scikit-image
