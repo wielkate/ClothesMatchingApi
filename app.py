@@ -1,11 +1,10 @@
-from fastapi import FastAPI, UploadFile, File
-
-from process_image import process_image_internal
+from fastapi import FastAPI, File, UploadFile
+from rembg import remove
 
 app = FastAPI()
 
 
-@app.post("/process-image/")
-async def process_image(file: UploadFile = File(...)):
-    color_name = process_image_internal(file.file)
-    return {"message": "Image uploaded", "filename": file.filename, "color": color_name}
+@app.post("/remove_bg/")
+async def remove_bg(file: UploadFile = File(...)):
+    output = remove(file.file.read())
+    return {"message": "Background removed", "filename": file.filename, "file": output}
