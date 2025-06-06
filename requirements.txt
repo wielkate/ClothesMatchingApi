@@ -1,5 +1,4 @@
 fastapi
-onnxruntime
-rembg
+colorthief
 uvicorn
 python-multipart
