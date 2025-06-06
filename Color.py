@@ -1,5 +1,3 @@
-from colorsys import rgb_to_hsv
-
 from skimage.color import rgb2lab
 
 
