@@ -1,12 +1,10 @@
 import logging
-import os
+from collections import defaultdict
 
 from fastapi import FastAPI, File, UploadFile, Form
 from supabase import create_client
 
-from clothes import add, edit, delete, load_clothes
-from commons.global_colors import load_colors
-from commons.global_combinations import load_combinations
+from commons.constants import SUPABASE_URL, SUPABASE_KEY
 from service.process_image_internal import get_dominant_color_name
 
 GREY_LIGHT = '\033[37m'
@@ -21,21 +19,20 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-SUPABASE_URL = os.getenv('SUPABASE_URL')
-SUPABASE_KEY = os.getenv('SUPABASE_KEY')
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+
 app = FastAPI()
+
+
+@app.get('/')
+async def home_root():
+    return {'message': 'Success'}
 
 
 @app.post('/process_image/')
 async def process_image(file: UploadFile = File(...)):
     color = get_dominant_color_name(file.file)
     return {'message': 'Color name determined', 'filename': file.filename, 'color': color}
-
-
-@app.get('/')
-async def home_root():
-    return {'message': 'Success'}
 
 
 @app.post('/upload')
@@ -63,33 +60,43 @@ async def delete_all_images():
 
 @app.post('/add')
 async def add_clothing_item(filename: str = Form(...), color: str = Form(...)):
-    add(filename, color)
+    supabase.table("clothes").upsert({"filename": filename, "color": color}).execute()
     return {'message': f"Added file {filename} with color {color} to database"}
 
 
 @app.put('/edit')
 async def edit_clothing_item(filename: str = Form(...), new_color: str = Form(...)):
-    edit(filename, new_color)
+    supabase.table("clothes").update({"color": new_color}).eq("filename", filename).execute()
     return {'message': f"Updated file {filename} color to {new_color} in database"}
 
 
 @app.delete('/delete/{filename}')
 async def delete_clothing_item(filename: str):
-    delete(filename)
+    supabase.table("clothes").delete().eq("filename", filename).execute()
     supabase.storage.from_('images').remove([filename])
     return {'message': f'File {filename} deleted successfully'}
 
 
-@app.get('/get_clothes', response_model=list[tuple[str, str]])
+@app.get('/get_clothes')
 async def get_all_clothes():
-    return load_clothes()
-
-
-@app.get('/get_all_combinations/{mode}')
-async def get_all_combinations(mode: str):
-    return load_combinations(mode)
+    response = supabase.table("clothes").select("filename", "color").execute()
+    return response.data
 
 
 @app.get('/get_color_names')
 async def get_color_names():
-    return [color.name for color in load_colors()]
+    response = supabase.table("colors").select("name").execute()
+    return [color["name"] for color in response.data]
+
+
+@app.get('/get_all_combinations/{mode}')
+async def get_all_combinations(mode: str):
+    response = supabase.table("combinations").select("*").eq("mode", mode).execute()
+    grouped = defaultdict(list)
+    for row in response.data:
+        base_color = row.get("base_color")
+        related_color = row.get("related_color")
+        grouped[base_color].append(related_color)
+
+    logging.info(f'Loaded {len(grouped)} {mode.lower()} combinations from Supabase')
+    return grouped

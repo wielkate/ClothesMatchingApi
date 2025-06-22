@@ -1,21 +1,16 @@
 import logging
+import csv
 
-import psycopg2
-
-from commons.constants import SQL_GET_ALL_COLORS, DATABASE_PARAMS
 from models.Color import Color
 
 logger = logging.getLogger(__name__)
 
 
 def load_colors():
-    with psycopg2.connect(**DATABASE_PARAMS) as connection:
-        with connection.cursor() as cursor:
-            cursor.execute(SQL_GET_ALL_COLORS)
-            colors = cursor.fetchall()
-
-    logger.info(f'Loaded {len(colors)} colors from database')
-    return [Color(color) for color in colors]
-
+    file = open(file="resources/Colors.csv", mode='r', encoding='utf-8')
+    return [
+        Color(row[0], row[1], row[2], row[3])
+        for row in csv.reader(file, delimiter=',')
+    ]
 
 global_colors = load_colors()

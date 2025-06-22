@@ -1,9 +1,13 @@
 import os
 
+PASSWORD = os.getenv('PASSWORD')
+SUPABASE_URL = os.getenv('SUPABASE_URL')
+SUPABASE_KEY = os.getenv('SUPABASE_KEY')
+
 DATABASE_PARAMS = {
     'dbname': 'postgres',
     'user': 'postgres',
-    'password': os.getenv('PASSWORD'),
+    'password': PASSWORD,
     'host': 'db.fvhfcvqhlrfhwxgqkhan.supabase.co',
     'port': '5432'
 }

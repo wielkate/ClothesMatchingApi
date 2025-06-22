@@ -4,11 +4,11 @@ from skimage.color import rgb2lab
 
 
 class Color:
-    def __init__(self, row):
-        self.name = row[0]
-        self.r = int(row[1]) / 255
-        self.g = int(row[2]) / 255
-        self.b = int(row[3]) / 255
+    def __init__(self, name, r, g, b):
+        self.name = name
+        self.r = int(r) / 255
+        self.g = int(g) / 255
+        self.b = int(b) / 255
         self.lab = rgb2lab([self.r, self.g, self.b])
         self.hsv = self.__get_hsv_in_degrees_and_percentage__()
 
