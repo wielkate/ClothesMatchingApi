@@ -1,10 +1,13 @@
 import logging
 import os
 
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, Form
 from supabase import create_client
 
-from process_image_internal import get_dominant_color_name
+from clothes import add, edit, delete, load_clothes
+from commons.global_colors import load_colors
+from commons.global_combinations import load_combinations
+from service.process_image_internal import get_dominant_color_name
 
 GREY_LIGHT = '\033[37m'
 WHITE = '\033[97m'
@@ -50,15 +53,43 @@ async def upload_image(file: UploadFile = File(...)):
     return {'url': url}
 
 
-@app.delete('/delete/{filename}')
-async def delete_image(filename: str):
-    supabase.storage.from_('images').remove([filename])
-    return {'message': f'File {filename} deleted successfully'}
-
-
 @app.delete('/delete')
 async def delete_all_images():
     files = supabase.storage.from_('images').list()
     names = [file.get('name') for file in files]
     supabase.storage.from_('images').remove(names)
-    return {'message': 'All images deleted successfully'}
+    return {'message': 'All images deleted successfully from bucket'}
+
+
+@app.post('/add')
+async def add_clothing_item(filename: str = Form(...), color: str = Form(...)):
+    add(filename, color)
+    return {'message': f"Added file {filename} with color {color} to database"}
+
+
+@app.put('/edit')
+async def edit_clothing_item(filename: str = Form(...), new_color: str = Form(...)):
+    edit(filename, new_color)
+    return {'message': f"Updated file {filename} color to {new_color} in database"}
+
+
+@app.delete('/delete/{filename}')
+async def delete_clothing_item(filename: str):
+    delete(filename)
+    supabase.storage.from_('images').remove([filename])
+    return {'message': f'File {filename} deleted successfully'}
+
+
+@app.get('/get_clothes', response_model=list[tuple[str, str]])
+async def get_all_clothes():
+    return load_clothes()
+
+
+@app.get('/get_all_combinations/{mode}')
+async def get_all_combinations(mode: str):
+    return load_combinations(mode)
+
+
+@app.get('/get_color_names')
+async def get_color_names():
+    return [color.name for color in load_colors()]
