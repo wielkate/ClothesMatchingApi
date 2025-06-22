@@ -3,3 +3,4 @@ colorthief
 uvicorn
 python-multipart
 scikit-image
+supabase
