@@ -1,6 +1,7 @@
 import logging
 
 from fastapi import FastAPI, File, UploadFile, Form
+from starlette.responses import PlainTextResponse
 from supabase import create_client
 
 from commons.constants import SUPABASE_URL, SUPABASE_KEY
@@ -19,7 +20,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-
 app = FastAPI()
 
 
@@ -28,10 +28,9 @@ async def home_root():
     return {'message': 'Success'}
 
 
-@app.post('/process_image/')
+@app.post('/process_image/', response_class=PlainTextResponse)
 async def process_image(file: UploadFile = File(...)):
-    color = get_dominant_color_name(file.file)
-    return {'message': 'Color name determined', 'filename': file.filename, 'color': color}
+    return get_dominant_color_name(file.file)
 
 
 @app.post('/upload')
@@ -77,15 +76,24 @@ async def delete_clothing_item(filename: str):
 
 
 @app.get('/get_clothes')
-async def get_all_clothes():
-    return supabase.table("clothes").select("filename", "color").execute().data
+async def get_clothes():
+    response = supabase.table("clothes").select("filename", "color").execute()
+    return [(item['filename'], item['color']) for item in response.data][::-1]
 
 
 @app.get('/get_color_names')
 async def get_color_names():
-    return supabase.table("colors").select("name").execute().data
+    response = supabase.table("colors").select("color").execute()
+    return [row["color"] for row in response.data]
 
 
-@app.get('/get_all_combinations/{mode}')
-async def get_all_combinations(mode: str):
-    return supabase.table("combinations").select("*").eq("mode", mode).execute().data
+@app.post('/get_combinations/')
+async def get_combinations(mode: str = Form(...), color: str = Form(...)):
+    response = supabase.table("combinations").select("related_color").eq("mode", mode).eq("color", color).execute()
+    return [row["related_color"] for row in response.data]
+
+
+@app.post('/get_ids')
+async def get_ids(colors: list[str] = Form(...), exclude_id: str = Form(...)):
+    response = supabase.table("clothes").select("filename").in_("color", colors).neq("filename", exclude_id).execute()
+    return [row["filename"] for row in response.data]
