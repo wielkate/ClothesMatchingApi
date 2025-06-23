@@ -1,6 +1,6 @@
 import logging
 
-from clothes import prepare_clothes
+from service.prepare_clothes import prepare_clothes
 from service.prepare_colors import prepare_colors
 from service.prepare_combinations import prepare_combinations
 

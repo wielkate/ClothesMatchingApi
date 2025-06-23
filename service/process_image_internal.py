@@ -1,7 +1,7 @@
 from colorthief import ColorThief
 from skimage.color import deltaE_ciede2000, rgb2lab
 
-from commons.global_colors import global_colors
+from service import global_colors
 
 
 def closest_color_name(rgb):

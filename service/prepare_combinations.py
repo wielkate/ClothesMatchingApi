@@ -3,7 +3,7 @@ import logging
 import psycopg2
 
 from commons.constants import DATABASE_PARAMS, SQL_CREATE_COMBINATIONS_TABLE, SQL_INSERT_INTO_COMBINATIONS_TABLE
-from commons.global_colors import global_colors
+from service import global_colors
 from models.Mode import Mode
 
 logger = logging.getLogger(__name__)

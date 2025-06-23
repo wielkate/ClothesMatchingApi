@@ -46,26 +46,3 @@ SQL_INSERT_INTO_COMBINATIONS_TABLE = """
     INSERT INTO combinations (color, related_color, mode)
     VALUES (%s, %s, %s)
 """
-SQL_INSERT_INTO_CLOTHES_TABLE = """
-    INSERT INTO clothes (filename, color)
-    VALUES (%s, %s)
-    ON CONFLICT (filename) DO UPDATE SET color = EXCLUDED.color
-"""
-
-SQL_GET_ALL_COLORS = "SELECT * FROM colors"
-SQL_GET_COMBINATIONS_BY_MODE = """
-    SELECT * FROM combinations
-    WHERE mode = %s
-"""
-SQL_GET_ALL_CLOTHES_ITEMS = "SELECT * FROM clothes"
-
-SQL_UPDATE_CLOTHES_TABLE = """
-    UPDATE clothes
-    SET color = %s
-    WHERE filename = %s
-"""
-
-SQL_DELETE_FROM_CLOTHES_TABLE = """
-    DELETE FROM clothes
-    WHERE filename = %s
-"""

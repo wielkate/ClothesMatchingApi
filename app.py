@@ -1,5 +1,4 @@
 import logging
-from collections import defaultdict
 
 from fastapi import FastAPI, File, UploadFile, Form
 from supabase import create_client
@@ -85,6 +84,7 @@ async def get_all_clothes():
 @app.get('/get_color_names')
 async def get_color_names():
     return supabase.table("colors").select("name").execute().data
+
 
 @app.get('/get_all_combinations/{mode}')
 async def get_all_combinations(mode: str):
