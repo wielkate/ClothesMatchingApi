@@ -79,24 +79,13 @@ async def delete_clothing_item(filename: str):
 
 @app.get('/get_clothes')
 async def get_all_clothes():
-    response = supabase.table("clothes").select("filename", "color").execute()
-    return response.data
+    return supabase.table("clothes").select("filename", "color").execute().data
 
 
 @app.get('/get_color_names')
 async def get_color_names():
-    response = supabase.table("colors").select("name").execute()
-    return [color["name"] for color in response.data]
-
+    return supabase.table("colors").select("name").execute().data
 
 @app.get('/get_all_combinations/{mode}')
 async def get_all_combinations(mode: str):
-    response = supabase.table("combinations").select("*").eq("mode", mode).execute()
-    grouped = defaultdict(list)
-    for row in response.data:
-        base_color = row.get("base_color")
-        related_color = row.get("related_color")
-        grouped[base_color].append(related_color)
-
-    logging.info(f'Loaded {len(grouped)} {mode.lower()} combinations from Supabase')
-    return grouped
+    return supabase.table("combinations").select("*").eq("mode", mode).execute().data
