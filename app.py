@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import FastAPI, File, UploadFile, Form
+from fastapi import FastAPI, File, UploadFile, Form, APIRouter
 from starlette.responses import PlainTextResponse
 from supabase import create_client
 
@@ -20,8 +20,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+api_v1 = (APIRouter(prefix="/v1"))
 app = FastAPI()
-
+app.include_router(api_v1)
 
 @app.get('/')
 async def home_root():
