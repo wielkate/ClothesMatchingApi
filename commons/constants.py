@@ -8,7 +8,7 @@ DATABASE_PARAMS = {
     'dbname': 'postgres',
     'user': 'postgres',
     'password': PASSWORD,
-    'host': 'db.fvhfcvqhlrfhwxgqkhan.supabase.co',
+    'host': 'db.qpzqxqiyzpwaowwmafvv.supabase.co',
     'port': '5432'
 }
 
