@@ -108,7 +108,7 @@ async def delete_clothing_item(filename: str):
 )
 async def get_clothes():
     response = supabase.table("clothes").select("filename", "color").execute()
-    return [(item['filename'], item['color']) for item in response.data][::-1]
+    return [(item['filename'], item['color']) for item in response.data]
 
 
 @app_v1.get(
