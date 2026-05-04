@@ -55,7 +55,15 @@ The application is deployed by [Render](https://render.com/), so it is available
    uvicorn app:app
    ```
 
-> Configure environment variables `SUPABASE_URL` and `SUPABASE_KEY` in .env.
+   The v1 routes are mounted under `/v1`, so for example the clothes list endpoint is:
+
+   ```bash
+   GET /v1/get_clothes
+   ```
+
+> Configure environment variables `SUPABASE_URL` and `SUPABASE_KEY` (and `PASSWORD` if required by your database setup).
+> 
+> Run prepare()
 
 ## Folder structure
 

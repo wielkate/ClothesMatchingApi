@@ -6,3 +6,4 @@ scikit-image
 supabase
 psycopg2
 starlette
+requests

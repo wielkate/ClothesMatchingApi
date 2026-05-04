@@ -1,18 +1,28 @@
 import os
 
 PASSWORD = os.getenv('PASSWORD')
-SUPABASE_URL = os.getenv('SUPABASE_URL')
 SUPABASE_KEY = os.getenv('SUPABASE_KEY')
+SUPABASE_ID = os.getenv('SUPABASE_ID')
+SUPABASE_URL = f"https://{SUPABASE_ID}.supabase.co"
+
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models'
+MODEL = 'gemini-2.5-flash-lite'
+# MODEL = 'gemini-2.5-flash' # 20 requests per day
+HEADERS = {
+    'x-goog-api-key': GEMINI_API_KEY,
+    'Content-Type': 'application/json'
+}
 
 DATABASE_PARAMS = {
     'dbname': 'postgres',
     'user': 'postgres',
     'password': PASSWORD,
-    'host': 'db.qpzqxqiyzpwaowwmafvv.supabase.co',
+    'host': f"db.{SUPABASE_ID}.supabase.co",
     'port': '5432'
 }
 
-COLORS_CSV = 'resources/Colors.csv'
+COLORS_CSV = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'resources', 'Colors.csv')
 
 SQL_CREATE_COLORS_TABLE = """
     CREATE TABLE IF NOT EXISTS colors (
@@ -33,7 +43,8 @@ SQL_CREATE_COMBINATIONS_TABLE = """
 SQL_CREATE_CLOTHES_TABLE = """
     CREATE TABLE IF NOT EXISTS clothes (
         filename TEXT PRIMARY KEY,
-        color TEXT NOT NULL
+        color TEXT NOT NULL,
+        tag TEXT NOT NULL
     )
 """
 

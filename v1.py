@@ -3,6 +3,7 @@ from starlette.responses import PlainTextResponse
 from supabase import create_client
 
 from commons.constants import SUPABASE_URL, SUPABASE_KEY
+from service.ai import get_clothes_tag
 from service.process_image_internal import get_dominant_color_name
 
 # Sub-app for v1
@@ -29,6 +30,15 @@ async def home_root():
 async def process_image(file: UploadFile = File(..., description="Image file to process")):
     return get_dominant_color_name(file.file)
 
+@app_v1.post(
+    '/tag/',
+    response_class=PlainTextResponse,
+    summary="Process image to get a clothes tag (type)",
+    description="Uploads an image and returns its tag.",
+    tags=["General"]
+)
+async def get_tag_via_ai(file: UploadFile = File(..., description="Image file to process")):
+    return get_clothes_tag(file.file)
 
 @app_v1.post(
     '/upload',
@@ -71,10 +81,11 @@ async def delete_all_images():
 )
 async def add_clothing_item(
         filename: str = Form(..., description="Filename of the clothing item"),
-        color: str = Form(..., description="Color of the clothing item")
+        color: str = Form(..., description="Color of the clothing item"),
+        tag: str = Form(..., description="Tag/type of the clothing item")
 ):
-    supabase.table("clothes").upsert({"filename": filename, "color": color}).execute()
-    return {'message': f"Added file {filename} with color {color} to database"}
+    supabase.table("clothes").upsert({"filename": filename, "color": color, "tag": tag}).execute()
+    return {'message': f"Added file {filename} with color {color}  and tag {tag} to database"}
 
 
 @app_v1.put(
@@ -103,12 +114,12 @@ async def delete_clothing_item(filename: str):
 @app_v1.get(
     '/get_clothes',
     summary="Get all clothes",
-    description="Returns a list of all clothing items with their filename and color.",
+    description="Returns a list of all clothing items with their filename, color and tag.",
     tags=["Clothes"]
 )
 async def get_clothes():
-    response = supabase.table("clothes").select("filename", "color").execute()
-    return [(item['filename'], item['color']) for item in response.data]
+    response = supabase.table("clothes").select("filename", "color", "tag").execute()
+    return [(item['filename'], item['color'], item['tag']) for item in response.data]
 
 
 @app_v1.get(
