@@ -146,10 +146,10 @@ async def get_combinations(mode: str = Form(...), color: str = Form(...)):
 
 @app_v1.post(
     '/get_ids',
-    summary="Get clothes ids by color",
-    description="Returns filenames of clothing items matching given colors, excluding a specific filename.",
+    summary="Get clothes with ids matched by color and tag",
+    description="Returns filenames of clothing items matching given colors, excluding a specific filename and the same tag.",
     tags=["Clothes"]
 )
-async def get_ids(colors: list[str] = Form(...), exclude_id: str = Form(...)):
-    response = supabase.table("clothes").select("filename").in_("color", colors).neq("filename", exclude_id).execute()
+async def get_ids(colors: list[str] = Form(...), exclude_id: str = Form(...), exclude_tag: str = Form(...)):
+    response = supabase.table("clothes").select("filename").in_("color", colors).neq("filename", exclude_id).neq("tag", exclude_tag).execute()
     return [row["filename"] for row in response.data]
